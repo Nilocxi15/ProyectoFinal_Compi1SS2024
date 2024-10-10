@@ -6,8 +6,8 @@
     <button type="button" class="btn btn-primary" (click)="clearContent()">
       Nuevo
     </button>
-    <button type="button" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-primary">Guardar como</button>
+    <button type="button" class="btn btn-primary" (click)="saveFile()">Guardar</button>
+    <button type="button" class="btn btn-primary" (click)="saveFileAs()">Guardar como</button>
   </div>
   <div class="tittle">
     <h3>
@@ -19,7 +19,7 @@
   type="file"
   id="fileInput"
   style="display: none"
-  onchange="openFile(event)"
+  (change)="openFile($event)"
 />
 <div class="input-group">
   <textarea
