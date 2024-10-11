@@ -1,44 +1,49 @@
 package com.mycompany.servidor;
 
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
 import java.net.*;
 import java.io.*;
 
-public class Servidor {
+public class Servidor extends WebSocketServer {
 
     public static void main(String[] args) {
-
-        ServerSocket servidor = null;
-        Socket sc = null;
-        DataInputStream in;
-        DataOutputStream out;
-
-        final int PUERTO = 5000;
-
-        try {
-            servidor = new ServerSocket(PUERTO);
-            System.out.println("Servidor iniciado");
-
-            while (true) {
-                sc = servidor.accept();
-
-                System.out.println("Cliente conectado");
-                in = new DataInputStream(sc.getInputStream());
-                out = new DataOutputStream(sc.getOutputStream());
-
-                String mensaje = in.readUTF();
-
-                String response = "";
-
-                out.writeUTF(response);
-
-                sc.close();
-                System.out.println("Cliente desconectado");
-            }
-
-        } catch (IOException e) {
-            System.out.println("Error: no se pudo iniciar el servidor");
-            System.out.println(e.getMessage());
-        }
+      final int port = 5000;
+      Servidor server = new Servidor(port);
+      server.start();
+      System.out.println("Servidor iniciado en el puerto: " + port);
     }
 
+    public Servidor(int port) {
+      super(new InetSocketAddress(port));
+    }
+
+  @Override
+  public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
+      System.out.println("Nueva conexión: " + webSocket.getRemoteSocketAddress());
+  }
+
+  @Override
+  public void onClose(WebSocket webSocket, int i, String s, boolean b) {
+      System.out.println("Conexión cerrada: " + webSocket.getRemoteSocketAddress());
+  }
+
+  @Override
+  public void onMessage(WebSocket webSocket, String s) {
+      System.out.println("Mensaje recibido: " + s);
+      webSocket.send("Respuesta desde el servidor: " + s + " Desde el servidor");
+  }
+
+  @Override
+  public void onError(WebSocket webSocket, Exception e) {
+      System.out.println("Error: " + e.getMessage());
+  }
+
+  @Override
+  public void onStart() {
+      System.out.println("Servidor iniciado");
+  }
 }

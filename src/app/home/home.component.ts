@@ -9,6 +9,29 @@ export class HomeComponent {
   line: number = 0;
   column: number = 0;
   title: string = '';
+  socket: WebSocket;
+
+  constructor() {
+    // Crear la conexión WebSocket
+    this.socket = new WebSocket('ws://localhost:5000');
+
+    // Manejar eventos de la conexión WebSocket
+    this.socket.onopen = () => {
+      console.log('Conexión WebSocket abierta');
+    };
+
+    this.socket.onmessage = (event) => {
+      console.log('Mensaje recibido del servidor:', event.data);
+    };
+
+    this.socket.onclose = () => {
+      console.log('Conexión WebSocket cerrada');
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('Error en la conexión WebSocket:', error);
+    };
+  }
 
   // Método para la posición del cursor
   updateCursorPosition(event: Event): void {
@@ -87,6 +110,22 @@ export class HomeComponent {
       link.href = URL.createObjectURL(blob);
       link.download = filename.endsWith('.cc') ? filename : `${filename}.cc`;
       link.click();
+    }
+  }
+
+  // Método para obtener el contenido del textarea
+  getContent(): void {
+    const textarea = document.getElementById('scriptTextarea') as HTMLTextAreaElement;
+    this.sendContent(textarea.value);
+  }
+
+  // Método para enviar el contenido del textarea al servidor
+  sendContent(scriptCode: string): void {
+    if (this.socket.readyState === WebSocket.OPEN) {
+      console.log('Enviando contenido al servidor...');
+      this.socket.send(scriptCode);
+    } else {
+      console.error('La conexión WebSocket no está abierta');
     }
   }
 }
