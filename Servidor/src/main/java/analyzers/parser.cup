@@ -1,0 +1,50 @@
+/*--------------- 1ra Area: Codigo de Usuario -----------------------*/
+//-------> importaciones Y paquetes
+package analyzers;
+
+import java_cup.runtime.Symbol;
+
+//------> Codigo para el parser,variables, metodos, etc.
+
+paser code
+{:
+    // Metodo al que se llama automaticametne ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!! ERROR SINTACTICO !!!");
+        System.out.println("\t\tLexema: " + lexema);
+        System.out.println("\t\tFila: " + fila);
+        System.out.println("\t\tColumna: " + columna);
+
+    }
+
+    // Metodo al que se llama en el momento en que ya no es posible una recuperación de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {
+        String lexema = s.value.toSring();
+        int fila = s.right;
+        int columna = s.left;
+
+        System.out.println("!!! ERROR SINTACTICO, PANIC MODE !!!");
+        System.out.println("\t\tLexema: " + lexema);
+        System.out.println("\t\tFila: " + fila);
+        System.out.println("\t\tColumna: " + columna);
+    }
+:}
+
+//------> Codigo para las acciones gramaticales
+action code
+{:
+    
+:}
+
+/*--------------- 2da Area: Declaraciones -----------------------*/
+//------> declaracion de terminales
+
+//------> declaracion de no terminales
+
+/*--------------- 3ra Area: Reglas Gramaticales -----------------------*/

@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   line: number = 0;
   column: number = 0;
   title: string = '';
@@ -31,6 +31,17 @@ export class HomeComponent {
     this.socket.onerror = (error) => {
       console.error('Error en la conexión WebSocket:', error);
     };
+  }
+
+  ngOnInit(): void {
+    // Cargar contenido del textarea
+    this.loadCreateTextareaContent();
+
+    // Agregar event listeners para guardar contenido en localStorage
+    const createTextarea = document.getElementById('scriptTextarea') as HTMLTextAreaElement;
+    if (createTextarea) {
+      createTextarea.addEventListener('input', this.saveCreateTextareaContent.bind(this));
+    }
   }
 
   // Método para la posición del cursor
@@ -126,6 +137,23 @@ export class HomeComponent {
       this.socket.send(scriptCode);
     } else {
       console.error('La conexión WebSocket no está abierta');
+    }
+  }
+
+  // Método para guardar el contenido de createTextarea en localStorage
+  saveCreateTextareaContent(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    localStorage.setItem('createTextareaContent', textarea.value);
+  }
+
+  // Método para cargar el contenido de createTextarea desde localStorage
+  loadCreateTextareaContent(): void {
+    const savedContent = localStorage.getItem('createTextareaContent');
+    if (savedContent) {
+      const textarea = document.getElementById('scriptTextarea') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.value = savedContent;
+      }
     }
   }
 }
