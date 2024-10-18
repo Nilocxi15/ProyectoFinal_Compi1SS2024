@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+//Importación del analizador jison
+import * as parser from '../analyzers/analyzer';
 
 @Component({
   selector: 'app-home',

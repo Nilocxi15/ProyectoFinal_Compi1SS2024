@@ -3,12 +3,15 @@
 %option case-sensitive
 
 %%
+
 /*Expresiones Regulares*/
 [ \t\r\n\f]     {/* Ignorar espacios en blanco */}
 
-"!!".*          return 'comentario1'//Comentario de una linea
-"<!--".*"-->"   return 'comentario2'//Comentario de varias lineas
+//Comentarios
+"!!".*\b          return 'comentario1'
+"<!--".*"-->"\b   return 'comentario2' 
 
+//Simbolos para operaciones
 "+"             return 'mas'
 "-"             return 'menos'
 "/"             return 'div'
@@ -25,6 +28,14 @@
 "("             return 'para'
 ")"             return 'parc'
 
+//Etiquetas HTML
+"C_CC"          return 'HTML'
+"C_HEAD"       return 'HEAD'
+"C_TITLE"       return 'TITLE'
+"C_LINK"        return 'LINK'
+"C_BODY"        return 'BODY'
+"C_SPAN"        return 'SPAN'
+
 <<EOF>>         return 'EOF'
 
 .               return 'INVALID'
@@ -40,4 +51,6 @@
 
 ini : comentarios EOF;
 
-comentarios : 
+comentarios : comentario1
+            | comentario2
+            | error { console.log('Error: ' + yytext + ' Línea: ' + (this._$.first_line) + ' Columna: ' + (this._$.first_column)); };
