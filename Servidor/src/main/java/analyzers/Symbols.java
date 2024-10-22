@@ -8,27 +8,161 @@ package analyzers;
 /** CUP generated class containing symbol constants. */
 public class Symbols {
   /* terminals */
-  public static final int div = 5;
-  public static final int decimal = 9;
-  public static final int num = 8;
+  public static final int Input = 27;
+  public static final int BracketClose = 13;
+  public static final int GreaterThan = 11;
+  public static final int Textarea = 28;
+  public static final int LessEqual = 10;
+  public static final int Plus = 3;
+  public static final int Button = 34;
+  public static final int h1End = 74;
+  public static final int TextAlign = 39;
+  public static final int Minus = 4;
+  public static final int Div = 5;
+  public static final int Mult = 6;
+  public static final int href = 43;
+  public static final int Title = 23;
+  public static final int DivHtmlEnd = 70;
+  public static final int LessThan = 9;
+  public static final int TitleEnd = 62;
+  public static final int FontSizeSentence = 46;
+  public static final int Color = 37;
+  public static final int Link = 24;
+  public static final int SelectEnd = 68;
+  public static final int InputEnd = 66;
+  public static final int Option = 30;
+  public static final int ParClose = 19;
+  public static final int Span = 26;
+  public static final int BodyEnd = 64;
+  public static final int ImageSize = 76;
+  public static final int TextareaEnd = 67;
+  public static final int Body = 25;
+  public static final int LinkEnd = 63;
+  public static final int pEnd = 75;
+  public static final int ButtonEnd = 73;
+  public static final int p = 36;
+  public static final int BracketOpen = 12;
+  public static final int ColsSentence = 50;
+  public static final int OptionEnd = 69;
+  public static final int altSentence = 53;
+  public static final int id = 41;
+  public static final int Head = 22;
+  public static final int Img = 32;
+  public static final int onclickSentence = 52;
+  public static final int And = 15;
+  public static final int TextAlignSentence = 59;
+  public static final int Or = 16;
+  public static final int name = 42;
   public static final int EOF = 0;
-  public static final int menos = 3;
+  public static final int ColorSentence = 45;
+  public static final int HeadEnd = 61;
+  public static final int FontSize = 56;
+  public static final int Hexadecimal = 55;
+  public static final int NotEqual = 8;
+  public static final int Type = 40;
+  public static final int Br = 33;
+  public static final int FontFamily = 38;
+  public static final int LinkHtml = 58;
+  public static final int GreaterEqual = 14;
+  public static final int SpanEnd = 65;
   public static final int error = 1;
-  public static final int por = 4;
-  public static final int parc = 7;
-  public static final int mas = 2;
-  public static final int para = 6;
+  public static final int Quotes = 20;
+  public static final int h1 = 35;
+  public static final int Select = 29;
+  public static final int Number = 54;
+  public static final int Background = 44;
+  public static final int TextAliginSentence = 48;
+  public static final int RowsSentence = 51;
+  public static final int Not = 17;
+  public static final int ParOpen = 18;
+  public static final int Text = 57;
+  public static final int Assign = 2;
+  public static final int ImgEnd = 71;
+  public static final int HtmlEnd = 60;
+  public static final int Equal = 7;
+  public static final int Html = 21;
+  public static final int FontFamilySentence = 47;
+  public static final int TypeSentence = 49;
+  public static final int DivHtml = 31;
+  public static final int BrEnd = 72;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
-  "mas",
-  "menos",
-  "por",
-  "div",
-  "para",
-  "parc",
-  "num",
-  "decimal"
+  "Assign",
+  "Plus",
+  "Minus",
+  "Div",
+  "Mult",
+  "Equal",
+  "NotEqual",
+  "LessThan",
+  "LessEqual",
+  "GreaterThan",
+  "BracketOpen",
+  "BracketClose",
+  "GreaterEqual",
+  "And",
+  "Or",
+  "Not",
+  "ParOpen",
+  "ParClose",
+  "Quotes",
+  "Html",
+  "Head",
+  "Title",
+  "Link",
+  "Body",
+  "Span",
+  "Input",
+  "Textarea",
+  "Select",
+  "Option",
+  "DivHtml",
+  "Img",
+  "Br",
+  "Button",
+  "h1",
+  "p",
+  "Color",
+  "FontFamily",
+  "TextAlign",
+  "Type",
+  "id",
+  "name",
+  "href",
+  "Background",
+  "ColorSentence",
+  "FontSizeSentence",
+  "FontFamilySentence",
+  "TextAliginSentence",
+  "TypeSentence",
+  "ColsSentence",
+  "RowsSentence",
+  "onclickSentence",
+  "altSentence",
+  "Number",
+  "Hexadecimal",
+  "FontSize",
+  "Text",
+  "LinkHtml",
+  "TextAlignSentence",
+  "HtmlEnd",
+  "HeadEnd",
+  "TitleEnd",
+  "LinkEnd",
+  "BodyEnd",
+  "SpanEnd",
+  "InputEnd",
+  "TextareaEnd",
+  "SelectEnd",
+  "OptionEnd",
+  "DivHtmlEnd",
+  "ImgEnd",
+  "BrEnd",
+  "ButtonEnd",
+  "h1End",
+  "pEnd",
+  "ImageSize"
   };
 }
 

@@ -6,7 +6,6 @@ import java_cup.runtime.Symbol;
 //------> Codigo para el parser,variables, metodos
 parser code
 {:
-    public String resultado="";
 
     //Metodo al que se llama automaticamente ante algun error sintactico
     public void syntax_error(Symbol s)
@@ -19,8 +18,6 @@ parser code
         System.out.println("\t\tLexema: "+lexema);
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
-
-
 
     }
 
@@ -36,48 +33,231 @@ parser code
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
 
-
     }
 :}
 
 //------> Codigo para las acciones gramaticales
 action code
 {:
+  //Metodos para contar los atributos de la etiqueta C_CC
+  private int ccField1 = 0;
+  private int ccField2 = 0;
+
+  private void ccFieldOne() {
+    ccField1++;
+  }
+
+  private void ccFieldTwo() {
+    ccField2++;
+  }
+
+  private void ccFieldReset() {
+    ccField1 = 0;
+    ccField2 = 0;
+  }
+
+  private void verifyCCFields() {
+    if (ccField1 == 1 && ccField2 == 1) {
+      System.out.println("Los campos de la etiqueta C_CC son correctos");
+    }
+    else if (ccField1 == 0 && ccField2 == 1) {
+      System.out.println("Parametro id de la etiqueta C_CC no encontrado");
+    }
+    else if (ccField1 == 1 && ccField2 == 0) {
+      System.out.println("Parametro name de la etiqueta C_CC no encontrado");
+    }
+    else {
+      System.out.println("Parametros id y name de la etiqueta C_CC no encontrados");
+    }
+  }
+
+  //Metodos para contar los atributos de las etiquetas de C_HEAD
+  private int chField1 = 0;
+  private int chField2 = 0;
+
+  private void chFieldOne() {
+    chField1++;
+  }
+
+  private void chFieldTwo() {
+    chField2++;
+  }
+
+  private void chFieldReset() {
+    chField1 = 0;
+    chField2 = 0;
+  }
+
+  private void verifyCHFields() {
+    if (chField1 == 1 && chField2 == 1) {
+      System.out.println("Los campos de la etiqueta C_HEADER son correctos");
+    }
+    else if (chField1 == 0 && chField2 == 1) {
+      System.out.println("Contenido del titulo de la etiqueta C_HEADER no encontrado");
+    }
+    else if (chField1 == 1 && chField2 == 0) {
+      System.out.println("Parametro link de la etiqueta C_HEADER no encontrado");
+    }
+    else {
+      System.out.println("Parametros id y name de la etiqueta C_HEADER no encontrados");
+    }
+  }
+
+  //Metodo para contar el atributo de la etiqueta de C_BODY
+  private int cbField1 = 0;
+
+  private void cbFieldOne() {
+    cbField1++;
+  }
+
+  private void cbFieldReset() {
+    cbField1 = 0;
+  }
+
+  private void verifyCBFields() {
+    if (cbField1 == 1) {
+      System.out.println("El campo de la etiqueta C_BODY es correcto");
+    }
+    else {
+      System.out.println("Parametro background de la etiqueta C_BODY no encontrado");
+    }
+  }
+
+
 :}
 
 /*--------------- 2da Area: Declaraciones -----------------------*/
 //------> declaracion de terminales
-terminal mas,menos,por,div,para,parc;
-terminal String num, decimal;
+terminal Assign, Plus, Minus, Div, Mult, Equal, NotEqual, LessThan, LessEqual, GreaterThan, BracketOpen, BracketClose,
+                GreaterEqual, And, Or, Not, ParOpen, ParClose, Quotes, Html, Head, Title, Link, Body, Span, Input,
+                Textarea, Select, Option, DivHtml, Img, Br, Button, h1, p, Color, FontFamily, TextAlign, Type, id, name,
+                href, Background, ColorSentence, FontSizeSentence, FontFamilySentence, TextAliginSentence, TypeSentence,
+                ColsSentence, RowsSentence, onclickSentence, altSentence, Number, Hexadecimal, FontSize, Text, LinkHtml,
+                TextAlignSentence, HtmlEnd, HeadEnd, TitleEnd, LinkEnd, BodyEnd, SpanEnd, InputEnd, TextareaEnd, SelectEnd,
+                OptionEnd, DivHtmlEnd, ImgEnd, BrEnd, ButtonEnd, h1End, pEnd, ImageSize;
+
+
 
 //------> declaracion de no terminales
-non terminal String INICIO,E;
+nonterminal INICIO, CONTENTHEADER, HEADER, TEXT, ATRIBINICIO, BODY, LINKTEXT, BODYTEXT, COLOR, BODYCONTENT, TEXTAREAPARAMETERS,
+            SPANPARAMETERS, INPUTPARAMETERS, SELECTPARAMETERS, OPTIONPARAMETERS, DIVHTMLPARAMETERS, IMGPARAMETERS, BRPARAMETERS,
+            BUTTONPARAMETERS, H1PARAMETERS, PPARAMETERS, SPECIALTEXT, SIGNS;
 
 //----> precedencia de menor a mayor
+/*
 precedence left mas, menos;
 precedence left por, div;
+*/
 
 start with INICIO;
 
 /*--------------- 3ra Area: Reglas Semanticas -----------------------*/
-INICIO::=E:a {: resultado=a; :};
+INICIO ::= LessThan Html ATRIBINICIO GreaterThan HEADER BODY LessThan HtmlEnd GreaterThan {:System.out.println("Documento correcto");:};
 
-E::= E:a mas E:b {: double val1= Double.parseDouble(a);
-                    double val2= Double.parseDouble(b);
-                    double r = val1+val2;
-                    RESULT = String.valueOf(r); :}
-    |E:a menos E:b {: double val1= Double.parseDouble(a);
-                    double val2= Double.parseDouble(b);
-                    double r = val1-val2;
-                    RESULT = String.valueOf(r); :}
-    |E:a div E:b {: double val1= Double.parseDouble(a);
-                    double val2= Double.parseDouble(b);
-                    double r = val1/val2;
-                    RESULT = String.valueOf(r); :}
-    |E:a por E:b {: double val1= Double.parseDouble(a);
-                    double val2= Double.parseDouble(b);
-                    double r = val1*val2;
-                    RESULT = String.valueOf(r); :}
-    |para E:a {: RESULT = a; :} parc
-    |num:a {: RESULT = a; :}
-    |decimal:a {: RESULT = a; :};
+ATRIBINICIO ::= BracketOpen id Assign Quotes Text Quotes BracketClose ATRIBINICIO
+                {: ccFieldOne(); :}
+                |BracketOpen name Assign Quotes TEXT Quotes BracketClose ATRIBINICIO
+                {: ccFieldTwo(); :}
+                | error ATRIBINICIO
+                {:System.out.println("\t\tERROR EN LA PRODUCCION DE ATRIBUTOS DE INICIO");:}
+                | /* epsilon */;
+
+HEADER ::= LessThan Head GreaterThan CONTENTHEADER CONTENTHEADER LessThan HeadEnd GreaterThan
+            {:System.out.println("Se reconoció el cuerpo del header");:}
+            | error {:System.out.println("\t\tERROR EN LA PRODUCCION DE HEADER");:};
+
+CONTENTHEADER ::= LessThan Title GreaterThan TEXT LessThan TitleEnd GreaterThan
+              {: chFieldOne();:}
+              | LessThan Link LINKTEXT GreaterThan LessThan LinkEnd GreaterThan
+              | error; // El epsilon de esta producción está pendiente de revisión
+
+LINKTEXT ::= BracketOpen href Assign Quotes LinkHtml Quotes BracketClose
+            {: chFieldTwo();:}
+            | error LINKTEXT
+            {:System.out.println("\t\tERROR EN LA PRODUCCION DE LINKTEXT");:}
+            | /* epsilon */;
+
+BODY ::= LessThan Body BODYTEXT GreaterThan LessThan BODYCONTENT BodyEnd GreaterThan
+        | error
+        {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODY");:};
+
+BODYTEXT ::= BracketOpen Background Assign Quotes COLOR Quotes BracketClose
+            | error BODYTEXT
+            {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYTEXT");:}
+            | /* epsilon */;
+
+BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SpanEnd GreaterThan LessThan BODYCONTENT
+                | Input INPUTPARAMETERS GreaterThan LessThan InputEnd GreaterThan LessThan BODYCONTENT
+                | Textarea GreaterThan LessThan TextareaEnd GreaterThan LessThan BODYCONTENT
+                | Select GreaterThan LessThan SelectEnd GreaterThan LessThan BODYCONTENT
+                | Option GreaterThan LessThan OptionEnd GreaterThan LessThan BODYCONTENT
+                | DivHtml GreaterThan LessThan DivHtmlEnd GreaterThan LessThan BODYCONTENT
+                | Img GreaterThan LessThan ImgEnd GreaterThan LessThan BODYCONTENT
+                | Br GreaterThan LessThan BrEnd GreaterThan LessThan BODYCONTENT
+                | Button GreaterThan LessThan ButtonEnd GreaterThan LessThan BODYCONTENT
+                | h1 GreaterThan LessThan h1End GreaterThan LessThan BODYCONTENT
+                | p GreaterThan LessThan pEnd GreaterThan LessThan BODYCONTENT
+                | error BODYCONTENT
+                {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYCONTENT");:}
+                | /* epsilon */;
+
+SPANPARAMETERS ::= BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose SPANPARAMETERS
+                  | BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose SPANPARAMETERS
+                  | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose SPANPARAMETERS
+                  | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose SPANPARAMETERS
+                  | BracketOpen id Assign Quotes Text Quotes BracketClose SPANPARAMETERS
+                  | error SPANPARAMETERS
+                  | /* epsilon */;
+
+INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type Quotes BracketClose INPUTPARAMETERS
+                    | BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose INPUTPARAMETERS
+                    | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose INPUTPARAMETERS
+                    | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose INPUTPARAMETERS
+                    | BracketOpen id Assign Quotes Text Quotes BracketClose INPUTPARAMETERS
+                    | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose INPUTPARAMETERS
+                    | error INPUTPARAMETERS
+                    | /* epsilon */;
+
+TEXTAREAPARAMETERS ::= ;
+
+SELECTPARAMETERS ::= ;
+
+OPTIONPARAMETERS ::= ;
+
+DIVHTMLPARAMETERS ::= ;
+
+IMGPARAMETERS ::= ;
+
+BRPARAMETERS ::= ;
+
+BUTTONPARAMETERS ::= ;
+
+H1PARAMETERS ::= ;
+
+PPARAMETERS ::= ;
+
+COLOR ::= Hexadecimal
+          | Color
+          | error;
+
+TEXT ::= Text TEXT
+        | Number TEXT
+        | Number
+        | Text;
+
+SIGNS ::= Assign
+          | Plus
+          | Minus
+          | Div
+          | Mult
+          | ParOpen
+          | ParClose
+          | Quotes
+          | BracketOpen
+          | BracketClose;
+
+
+SPECIALTEXT ::= Text SPECIALTEXT
+                | Number SPECIALTEXT
+                | SIGNS SPECIALTEXT
+                | /* epsilon */;

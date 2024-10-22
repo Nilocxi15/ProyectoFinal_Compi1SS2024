@@ -43,6 +43,7 @@ export class HomeComponent implements OnInit {
     const createTextarea = document.getElementById('scriptTextarea') as HTMLTextAreaElement;
     if (createTextarea) {
       createTextarea.addEventListener('input', this.saveCreateTextareaContent.bind(this));
+      createTextarea.addEventListener('keydown', this.handleTabKey.bind(this));
     }
   }
 
@@ -156,6 +157,22 @@ export class HomeComponent implements OnInit {
       if (textarea) {
         textarea.value = savedContent;
       }
+    }
+  }
+
+  // Método para manejar la tecla Tab en el textarea
+  handleTabKey(event: KeyboardEvent): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      // Set textarea value to: text before caret + tab + text after caret
+      textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+
+      // Put caret at right position again
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
     }
   }
 }
