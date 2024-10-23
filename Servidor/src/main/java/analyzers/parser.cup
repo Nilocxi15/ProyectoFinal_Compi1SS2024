@@ -133,15 +133,16 @@ terminal Assign, Plus, Minus, Div, Mult, Equal, NotEqual, LessThan, LessEqual, G
                 Textarea, Select, Option, DivHtml, Img, Br, Button, h1, p, Color, FontFamily, TextAlign, Type, id, name,
                 href, Background, ColorSentence, FontSizeSentence, FontFamilySentence, TextAliginSentence, TypeSentence,
                 ColsSentence, RowsSentence, onclickSentence, altSentence, Number, Hexadecimal, FontSize, Text, LinkHtml,
-                TextAlignSentence, HtmlEnd, HeadEnd, TitleEnd, LinkEnd, BodyEnd, SpanEnd, InputEnd, TextareaEnd, SelectEnd,
-                OptionEnd, DivHtmlEnd, ImgEnd, BrEnd, ButtonEnd, h1End, pEnd, ImageSize;
+                TextAlignSentence, HtmlEnd, HeadEnd, TitleEnd, LinkEnd, BodyEnd, SpanEnd, TextareaEnd, SelectEnd,
+                OptionEnd, DivHtmlEnd, ButtonEnd, h1End, pEnd, ImageSize, classSentence, Row, Column, src,
+                width, height, FunctionName;
 
 
 
 //------> declaracion de no terminales
 nonterminal INICIO, CONTENTHEADER, HEADER, TEXT, ATRIBINICIO, BODY, LINKTEXT, BODYTEXT, COLOR, BODYCONTENT, TEXTAREAPARAMETERS,
-            SPANPARAMETERS, INPUTPARAMETERS, SELECTPARAMETERS, OPTIONPARAMETERS, DIVHTMLPARAMETERS, IMGPARAMETERS, BRPARAMETERS,
-            BUTTONPARAMETERS, H1PARAMETERS, PPARAMETERS, SPECIALTEXT, SIGNS;
+            SPANPARAMETERS, INPUTPARAMETERS, SELECTPARAMETERS, DIVHTMLPARAMETERS, IMGPARAMETERS, CLASSOPTIONS, BUTTONETIQUETAS,
+            BUTTONPARAMETERS, H1PPARAMETERS, SPECIALTEXT, SIGNS, IMAGESIZES, SELECTETIQUETAS, SPANETIQUETAS;
 
 //----> precedencia de menor a mayor
 /*
@@ -186,17 +187,17 @@ BODYTEXT ::= BracketOpen Background Assign Quotes COLOR Quotes BracketClose
             {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYTEXT");:}
             | /* epsilon */;
 
-BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SpanEnd GreaterThan LessThan BODYCONTENT
-                | Input INPUTPARAMETERS GreaterThan LessThan InputEnd GreaterThan LessThan BODYCONTENT
-                | Textarea GreaterThan LessThan TextareaEnd GreaterThan LessThan BODYCONTENT
-                | Select GreaterThan LessThan SelectEnd GreaterThan LessThan BODYCONTENT
-                | Option GreaterThan LessThan OptionEnd GreaterThan LessThan BODYCONTENT
-                | DivHtml GreaterThan LessThan DivHtmlEnd GreaterThan LessThan BODYCONTENT
-                | Img GreaterThan LessThan ImgEnd GreaterThan LessThan BODYCONTENT
-                | Br GreaterThan LessThan BrEnd GreaterThan LessThan BODYCONTENT
-                | Button GreaterThan LessThan ButtonEnd GreaterThan LessThan BODYCONTENT
-                | h1 GreaterThan LessThan h1End GreaterThan LessThan BODYCONTENT
-                | p GreaterThan LessThan pEnd GreaterThan LessThan BODYCONTENT
+BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS SpanEnd GreaterThan LessThan BODYCONTENT
+                | Input INPUTPARAMETERS GreaterThan LessThan BODYCONTENT
+                | Textarea TEXTAREAPARAMETERS GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT
+                | Select SELECTPARAMETERS GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT
+                | Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan BODYCONTENT
+                | DivHtml DIVHTMLPARAMETERS GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT
+                | Img IMGPARAMETERS GreaterThan LessThan BODYCONTENT
+                | Br GreaterThan LessThan BODYCONTENT
+                | Button BUTTONPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT
+                | h1 H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT
+                | p H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT
                 | error BODYCONTENT
                 {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYCONTENT");:}
                 | /* epsilon */;
@@ -218,27 +219,80 @@ INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type Quotes BracketCl
                     | error INPUTPARAMETERS
                     | /* epsilon */;
 
-TEXTAREAPARAMETERS ::= ;
+TEXTAREAPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose TEXTAREAPARAMETERS
+                      | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose TEXTAREAPARAMETERS
+                      | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose TEXTAREAPARAMETERS
+                      | BracketOpen id Assign Quotes Text Quotes BracketClose TEXTAREAPARAMETERS
+                      | BracketOpen ColsSentence Assign Quotes Number Quotes BracketClose TEXTAREAPARAMETERS
+                      | BracketOpen RowsSentence Assign Quotes Number Quotes BracketClose TEXTAREAPARAMETERS
+                      | error TEXTAREAPARAMETERS
+                      | /* epsilon */;
 
-SELECTPARAMETERS ::= ;
+SELECTPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose SELECTPARAMETERS
+                    | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose SELECTPARAMETERS
+                    | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose SELECTPARAMETERS
+                    | BracketOpen id Assign Quotes Text Quotes BracketClose SELECTPARAMETERS
+                    | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose SELECTPARAMETERS
+                    | error SELECTPARAMETERS
+                    | /* epsilon */;
 
-OPTIONPARAMETERS ::= ;
+DIVHTMLPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen id Assign Quotes Text Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen classSentence Assign Quotes CLASSOPTIONS Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose DIVHTMLPARAMETERS
+                      | BracketOpen Background Assign Quotes COLOR Quotes BracketClose DIVHTMLPARAMETERS
+                      | error DIVHTMLPARAMETERS
+                      | /* epsilon */;
 
-DIVHTMLPARAMETERS ::= ;
+IMGPARAMETERS ::= BracketOpen src Assign Quotes LinkHtml Quotes BracketClose IMGPARAMETERS
+                  | BracketOpen width Assign Quotes IMAGESIZES Quotes BracketClose IMGPARAMETERS
+                  | BracketOpen height Assign Quotes IMAGESIZES Quotes BracketClose IMGPARAMETERS
+                  | BracketOpen altSentence Assign Quotes TEXT Quotes BracketClose IMGPARAMETERS
+                  | BracketOpen id Assign Quotes Text Quotes BracketClose IMGPARAMETERS
+                  | error IMGPARAMETERS
+                  | /* epsilon */;
 
-IMGPARAMETERS ::= ;
+BUTTONPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen id Assign Quotes Text Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen Background Assign Quotes COLOR Quotes BracketClose BUTTONPARAMETERS
+                    | BracketOpen onclickSentence Assign Quotes FunctionName Quotes BracketClose BUTTONPARAMETERS
+                    | error BUTTONPARAMETERS
+                    | /* epsilon */;
 
-BRPARAMETERS ::= ;
+H1PPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose H1PPARAMETERS
+                  | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose H1PPARAMETERS
+                  | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose H1PPARAMETERS
+                  | BracketOpen id Assign Quotes Text Quotes BracketClose H1PPARAMETERS
+                  | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose H1PPARAMETERS
+                  | error H1PPARAMETERS
+                  | /* epsilon */;
 
-BUTTONPARAMETERS ::= ;
+SELECTETIQUETAS ::= Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan SELECTETIQUETAS
+                    | error SELECTETIQUETAS
+                    | /* epsilon */;
 
-H1PARAMETERS ::= ;
+BUTTONETIQUETAS ::= Img IMGPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS
+                    | Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SpanEnd GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS
+                    | Br GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS
+                    | error BUTTONETIQUETAS
+                    | /* epsilon */;
 
-PPARAMETERS ::= ;
+SPANETIQUETAS ::= Br GreaterThan SPECIALTEXT LessThan SPANETIQUETAS
+                  | error SPANETIQUETAS
+                  | /* epsilon */;
 
 COLOR ::= Hexadecimal
           | Color
           | error;
+
+IMAGESIZES ::= FontSize
+              |ImageSize
+              |error;
 
 TEXT ::= Text TEXT
         | Number TEXT
@@ -256,6 +310,9 @@ SIGNS ::= Assign
           | BracketOpen
           | BracketClose;
 
+CLASSOPTIONS ::= Column
+                | Row
+                | error;
 
 SPECIALTEXT ::= Text SPECIALTEXT
                 | Number SPECIALTEXT

@@ -48,6 +48,7 @@ linkVal = ({Http}|{Https}) ([/.:?=&%] | {textVal})+
 hexadecimal = "#"[A-Za-z0-9]{6}
 fontSize = {number}+"px"
 imageSize = {number}+"%"
+functionName = {textVal}+"("")"
 
 //------> Estados
 
@@ -88,7 +89,7 @@ imageSize = {number}+"%"
 <YYINITIAL> "C_SPAN"             { System.out.println("Recognized: C_SPAN at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Span, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "C_INPUT"            { System.out.println("Recognized: C_INPUT at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Input, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "C_TEXTAREA"         { System.out.println("Recognized: C_TEXTAREA at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Textarea, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "C_SELECTED"         { System.out.println("Recognized: C_SELECTED at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Select, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "C_SELECT"           { System.out.println("Recognized: C_SELECTED at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Select, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "C_OPTION"           { System.out.println("Recognized: C_OPTION at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Option, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "C_DIV"              { System.out.println("Recognized: C_DIV at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.DivHtml, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "C_IMG"              { System.out.println("Recognized: C_IMG at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Img, (yycolumn + 1), (yyline + 1), (yytext())); }
@@ -102,13 +103,10 @@ imageSize = {number}+"%"
 <YYINITIAL> "/C_LINK"            { System.out.println("Recognized: /C_LINK at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.LinkEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_BODY"            { System.out.println("Recognized: /C_BODY at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.BodyEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_SPAN"            { System.out.println("Recognized: /C_SPAN at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.SpanEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "/C_INPUT"           { System.out.println("Recognized: /C_INPUT at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.InputEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_TEXTAREA"        { System.out.println("Recognized: /C_TEXTAREA at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.TextareaEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "/C_SELECTED"        { System.out.println("Recognized: /C_SELECTED at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.SelectEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "/C_SELECT"          { System.out.println("Recognized: /C_SELECTED at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.SelectEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_OPTION"          { System.out.println("Recognized: /C_OPTION at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.OptionEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_DIV"             { System.out.println("Recognized: /C_DIV at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.DivHtmlEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "/C_IMG"             { System.out.println("Recognized: /C_IMG at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.ImgEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "/C_BR"              { System.out.println("Recognized: /C_BR at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.BrEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_BUTTON"          { System.out.println("Recognized: /C_BUTTON at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.ButtonEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_H1"              { System.out.println("Recognized: /C_H1 at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.h1End, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "/C_P"               { System.out.println("Recognized: /C_P at line " + (yyline + 1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.pEnd, (yycolumn + 1), (yyline + 1), (yytext())); }
@@ -157,16 +155,24 @@ imageSize = {number}+"%"
 <YYINITIAL> "type"               { System.out.println("Recognized: type at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.TypeSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "cols"               { System.out.println("Recognized: cols at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.ColsSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "rows"               { System.out.println("Recognized: rows at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.RowsSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> "onclick()"          { System.out.println("Recognized: onclick() at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.onclickSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "onclick"          { System.out.println("Recognized: onclick() at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.onclickSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> "alt"                { System.out.println("Recognized: alt at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.altSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "class"              { System.out.println("Recognized: class at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.classSentence, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "row"                { System.out.println("Recognized: row at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Row, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "column"             { System.out.println("Recognized: column at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Column, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "src"                { System.out.println("Recognized: src at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.src, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "width"             { System.out.println("Recognized: width at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.width, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> "height"            { System.out.println("Recognized: height at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.height, (yycolumn + 1), (yyline + 1), (yytext())); }
+
 
 //-------> Simbolos ER
+<YYINITIAL> {imageSize}          { System.out.println("Recognized: imageSize at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.ImageSize, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> {number}             { System.out.println("Recognized: number at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Number, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> {hexadecimal}        { System.out.println("Recognized: hexadecimal at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Hexadecimal, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> {fontSize}           { System.out.println("Recognized: fontSize at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.FontSize, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> {textVal}            { System.out.println("Recognized: textVal at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.Text, (yycolumn + 1), (yyline + 1), (yytext())); }
 <YYINITIAL> {linkVal}            { System.out.println("Recognized: linkVal at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.LinkHtml, (yycolumn + 1), (yyline + 1), (yytext())); }
-<YYINITIAL> {imageSize}          { System.out.println("Recognized: imageSize at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.ImageSize, (yycolumn + 1), (yyline + 1), (yytext())); }
+<YYINITIAL> {functionName}       { System.out.println("Recognized: functionName at line " + (yyline +1) + ", column " + (yycolumn + 1) + ", text: " + yytext()); return new Symbol(Symbols.FunctionName, (yycolumn + 1), (yyline + 1), (yytext())); }
 
 //------> Errores Lexicos
 .                       { System.out.println("Error Lexico"+yytext()+" Linea "+yyline+" Columna "+yycolumn);}
