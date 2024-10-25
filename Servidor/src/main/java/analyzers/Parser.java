@@ -6,6 +6,7 @@
 package analyzers;
 
 import java_cup.runtime.Symbol;
+import java.time.LocalDateTime;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -718,18 +719,25 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
 
+  public String resultado = "Se encontraron errores durante el análisis del código";
+  boolean error = false;
+
     //Metodo al que se llama automaticamente ante algun error sintactico
     public void syntax_error(Symbol s)
     {
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
+        int tipo = s.sym;
 
         System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
         System.out.println("\t\tLexema: "+lexema);
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
+        System.out.println("\t\tTipo: "+tipo);
+        error = true;
 
+        error(fila, columna, tipo, lexema);
     }
 
     //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
@@ -738,12 +746,34 @@ public class Parser extends java_cup.runtime.lr_parser {
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
+        int tipo = s.sym;
 
         System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
         System.out.println("\t\tLexema: "+lexema);
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
+        System.out.println("\t\tTipo: "+tipo);
+        error = true;
 
+        error(fila, columna, tipo, lexema);
+    }
+
+    //Metodos para reiniciar los valores de resultado
+    public void resetParser() {
+      resultado = "Se encontraron errores durante el análisis del código";
+      error = false;
+    }
+
+    //Metodo para el manejo de errores
+    private void error(int fila, int columna, int tipo, String lexema) {
+      switch (tipo) {
+        case 2:
+          resultado += "\nError en la fila: "+fila+", columna: "+columna+". Se esperaba una variable, parámetro o el token '==' y se obtuvo: "+lexema;
+          break;
+        case 3:
+          resultado += "\nError en la fila: "+fila+", columna: "+columna+". No se esperaba el token: "+lexema; //Arreglas esto
+          break;
+      }
     }
 
 
@@ -752,9 +782,25 @@ public class Parser extends java_cup.runtime.lr_parser {
 class CUP$Parser$actions {
 
 
+
+  //Metodo para verificar el resultado del analisis
+  private void verifyParser() {
+  System.out.println("Estado del analisis " +error);
+    if (!error) {
+      resultado = null;
+      resultado = "------------------------------------------------------------------" + "\n";
+      resultado += "El analisis ha finalizado sin errores";
+      resultado += "\n";
+      resultado += "El archivo se generó correctamente con el nombre: "+ccName + "\n";
+      resultado += "------------------------------------------------------------------";
+    }
+  }
+
   //Metodos para contar los atributos de la etiqueta C_CC
   private int ccField1 = 0;
   private int ccField2 = 0;
+  private String ccName = "";
+  private String ccId = "";
 
   private void ccFieldOne() {
     ccField1++;
@@ -772,15 +818,35 @@ class CUP$Parser$actions {
   private void verifyCCFields() {
     if (ccField1 == 1 && ccField2 == 1) {
       System.out.println("Los campos de la etiqueta C_CC son correctos");
-    }
-    else if (ccField1 == 0 && ccField2 == 1) {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 0 && ccField2 == 1) {
+      ccId = java.time.LocalDateTime.now().toString();
       System.out.println("Parametro id de la etiqueta C_CC no encontrado");
-    }
-    else if (ccField1 == 1 && ccField2 == 0) {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 1 && ccField2 == 0) {
+      ccName = "CAPTCHA";
       System.out.println("Parametro name de la etiqueta C_CC no encontrado");
-    }
-    else {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 0 && ccField2 == 0) {
+      ccName = "CAPTCHA";
+      ccId = java.time.LocalDateTime.now().toString();
       System.out.println("Parametros id y name de la etiqueta C_CC no encontrados");
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 > 1 && ccField2 == 1) {
+      System.out.println("Se encontraron varios parametros id en la etiqueta C_CC");
+      System.out.println("El name encontrado es: "+ccName);
+      error = true;
+    } else if (ccField1 == 1 && ccField2 > 1) {
+      System.out.println("Se encontraron varios parametros name en la etiqueta C_CC");
+      System.out.println("El id encontrado es: "+ccId);
+      error = true;
+    } else {
+      System.out.println("Se encontraron varios parametros id y name en la etiqueta C_CC");
+      error = true;
     }
   }
 
@@ -804,15 +870,24 @@ class CUP$Parser$actions {
   private void verifyCHFields() {
     if (chField1 == 1 && chField2 == 1) {
       System.out.println("Los campos de la etiqueta C_HEADER son correctos");
-    }
-    else if (chField1 == 0 && chField2 == 1) {
+    } else if (chField1 == 0 && chField2 == 1) {
       System.out.println("Contenido del titulo de la etiqueta C_HEADER no encontrado");
-    }
-    else if (chField1 == 1 && chField2 == 0) {
+      error = true;
+    } else if (chField1 == 1 && chField2 == 0) {
       System.out.println("Parametro link de la etiqueta C_HEADER no encontrado");
-    }
-    else {
+      error = true;
+    } else if (chField1 == 0 && chField2 == 0) {
       System.out.println("Parametros id y name de la etiqueta C_HEADER no encontrados");
+      error = true;
+    } else if (chField1 > 1 && chField2 == 1) {
+      System.out.println("Se encontraron varios parametros link en la etiqueta C_HEADER");
+      error = true;
+    } else if (chField1 == 1 && chField2 > 1) {
+      System.out.println("Se encontraron varios parametros title en la etiqueta C_HEADER");
+      error = true;
+    } else {
+      System.out.println("Se encontraron varios parametros title y link en la etiqueta C_HEADER");
+      error = true;
     }
   }
 
@@ -836,6 +911,22 @@ class CUP$Parser$actions {
     }
   }
 
+  //Metodos para la escritura del archivo
+  private String head = null;
+  private String body = null;
+
+  private String titleHtml = null;
+  private String linkHtml = null;
+
+  private String bodyLabels = null;
+
+  private void resetStrings() {
+    head = null;
+    body = null;
+    titleHtml = null;
+    linkHtml = null;
+    bodyLabels = null;
+  }
 
 
   private final Parser parser;
@@ -877,7 +968,24 @@ class CUP$Parser$actions {
           case 1: // INICIO ::= LessThan Html ATRIBINICIO GreaterThan HEADER BODY LessThan HtmlEnd GreaterThan 
             {
               Object RESULT =null;
-		System.out.println("Documento correcto");
+		 verifyCCFields();
+            verifyParser();
+            verifyCHFields();
+            String text;
+            text = "<!DOCTYPE html>\n";
+            text += "<html lang = \"es\">\n";
+            if (head != null) {
+              text += head;
+            }
+            if (body != null) {
+              text += body;
+            }
+            text += "</html>";
+            System.out.println("CONTENIDO DEL DOCUMENTO: \n\n\n");
+            System.out.println(text);
+            ccFieldReset();
+            chFieldReset();
+            cbFieldReset();
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INICIO",0, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-8)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -886,7 +994,11 @@ class CUP$Parser$actions {
           case 2: // ATRIBINICIO ::= BracketOpen id Assign Quotes Text Quotes BracketClose ATRIBINICIO 
             {
               Object RESULT =null;
-		 ccFieldOne(); 
+		int idleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 ccFieldOne();
+                 ccId = String.valueOf(id); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("ATRIBINICIO",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -895,7 +1007,11 @@ class CUP$Parser$actions {
           case 3: // ATRIBINICIO ::= BracketOpen name Assign Quotes TEXT Quotes BracketClose ATRIBINICIO 
             {
               Object RESULT =null;
-		 ccFieldTwo(); 
+		int nameleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int nameright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object name = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 ccFieldTwo();
+                ccName = String.valueOf(name); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("ATRIBINICIO",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -904,7 +1020,7 @@ class CUP$Parser$actions {
           case 4: // ATRIBINICIO ::= error ATRIBINICIO 
             {
               Object RESULT =null;
-		System.out.println("\t\tERROR EN LA PRODUCCION DE ATRIBUTOS DE INICIO");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("ATRIBINICIO",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -922,7 +1038,16 @@ class CUP$Parser$actions {
           case 6: // HEADER ::= LessThan Head GreaterThan CONTENTHEADER CONTENTHEADER LessThan HeadEnd GreaterThan 
             {
               Object RESULT =null;
-		System.out.println("Se reconoció el cuerpo del header");
+		 head = "<head>\n";
+            head += "\t<charset=\"UTF-8\">\n";
+            head += "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+            if (titleHtml != null) {
+              head += "\t<title>"+titleHtml+"</title>\n";
+            }
+            if (linkHtml != null) {
+              head += "\t<link rel=\"stylesheet\" href=\""+linkHtml+"\">\n";
+            }
+            head += "</head>\n";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("HEADER",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -931,7 +1056,7 @@ class CUP$Parser$actions {
           case 7: // HEADER ::= error 
             {
               Object RESULT =null;
-		System.out.println("\t\tERROR EN LA PRODUCCION DE HEADER");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("HEADER",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -940,7 +1065,11 @@ class CUP$Parser$actions {
           case 8: // CONTENTHEADER ::= LessThan Title GreaterThan TEXT LessThan TitleEnd GreaterThan 
             {
               Object RESULT =null;
+		int titleleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int titleright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object title = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 chFieldOne();
+              titleHtml = String.valueOf(title);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("CONTENTHEADER",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -949,6 +1078,9 @@ class CUP$Parser$actions {
           case 9: // CONTENTHEADER ::= LessThan Link LINKTEXT GreaterThan LessThan LinkEnd GreaterThan 
             {
               Object RESULT =null;
+		int linkleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)).left;
+		int linkright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)).right;
+		Object link = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-4)).value;
 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("CONTENTHEADER",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -967,7 +1099,11 @@ class CUP$Parser$actions {
           case 11: // LINKTEXT ::= BracketOpen href Assign Quotes LinkHtml Quotes BracketClose 
             {
               Object RESULT =null;
+		int linkleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
+		int linkright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
+		Object link = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		 chFieldTwo();
+            linkHtml = String.valueOf(link);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("LINKTEXT",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -976,7 +1112,7 @@ class CUP$Parser$actions {
           case 12: // LINKTEXT ::= error LINKTEXT 
             {
               Object RESULT =null;
-		System.out.println("\t\tERROR EN LA PRODUCCION DE LINKTEXT");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("LINKTEXT",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -994,7 +1130,23 @@ class CUP$Parser$actions {
           case 14: // BODY ::= LessThan Body BODYTEXT GreaterThan LessThan BODYCONTENT BodyEnd GreaterThan 
             {
               Object RESULT =null;
-
+		int bodytextleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)).left;
+		int bodytextright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)).right;
+		Object bodytext = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-5)).value;
+		int bodycontentleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
+		int bodycontentright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
+		Object bodycontent = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		 
+          body = "<body";
+          if (bodytext != null) {
+            body += bodytext;
+          } else {
+            body += ">\n";
+          }
+          if (bodycontent != null) {
+            body += bodycontent;
+          }
+          body += "</body>\n";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODY",5, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1003,7 +1155,7 @@ class CUP$Parser$actions {
           case 15: // BODY ::= error 
             {
               Object RESULT =null;
-		System.out.println("\t\tERROR EN LA PRODUCCION DE BODY");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODY",5, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1012,7 +1164,10 @@ class CUP$Parser$actions {
           case 16: // BODYTEXT ::= BracketOpen Background Assign Quotes COLOR Quotes BracketClose 
             {
               Object RESULT =null;
-
+		int colorleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
+		int colorright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
+		Object color = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		 RESULT = " style=\"background: "+ String.valueOf(color) +"\">\n"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYTEXT",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1021,7 +1176,7 @@ class CUP$Parser$actions {
           case 17: // BODYTEXT ::= error BODYTEXT 
             {
               Object RESULT =null;
-		System.out.println("\t\tERROR EN LA PRODUCCION DE BODYTEXT");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYTEXT",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1039,7 +1194,10 @@ class CUP$Parser$actions {
           case 19: // BODYCONTENT ::= Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS SpanEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "SPAN\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-9)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1048,7 +1206,10 @@ class CUP$Parser$actions {
           case 20: // BODYCONTENT ::= Input INPUTPARAMETERS GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "INPUT\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1057,7 +1218,10 @@ class CUP$Parser$actions {
           case 21: // BODYCONTENT ::= Textarea TEXTAREAPARAMETERS GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "TEXTAREA\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-8)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1066,7 +1230,10 @@ class CUP$Parser$actions {
           case 22: // BODYCONTENT ::= Select SELECTPARAMETERS GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "SELECT\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-8)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1075,7 +1242,10 @@ class CUP$Parser$actions {
           case 23: // BODYCONTENT ::= Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "OPTION\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1084,7 +1254,10 @@ class CUP$Parser$actions {
           case 24: // BODYCONTENT ::= DivHtml DIVHTMLPARAMETERS GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "DIV\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-8)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1093,7 +1266,10 @@ class CUP$Parser$actions {
           case 25: // BODYCONTENT ::= Img IMGPARAMETERS GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "IMG\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1102,7 +1278,10 @@ class CUP$Parser$actions {
           case 26: // BODYCONTENT ::= Br GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "BR\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1111,7 +1290,10 @@ class CUP$Parser$actions {
           case 27: // BODYCONTENT ::= Button BUTTONPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "BUTTON\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-9)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1120,7 +1302,10 @@ class CUP$Parser$actions {
           case 28: // BODYCONTENT ::= h1 H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "H1\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-9)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1129,7 +1314,10 @@ class CUP$Parser$actions {
           case 29: // BODYCONTENT ::= p H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = "P\n" + a; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-9)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1813,7 +2001,10 @@ class CUP$Parser$actions {
           case 105: // COLOR ::= Hexadecimal 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("COLOR",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1822,7 +2013,10 @@ class CUP$Parser$actions {
           case 106: // COLOR ::= Color 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("COLOR",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1867,7 +2061,13 @@ class CUP$Parser$actions {
           case 111: // TEXT ::= Text TEXT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object b = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a) + " " + String.valueOf(b); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("TEXT",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1876,7 +2076,13 @@ class CUP$Parser$actions {
           case 112: // TEXT ::= Number TEXT 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object b = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a) + " " + String.valueOf(b); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("TEXT",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1885,7 +2091,10 @@ class CUP$Parser$actions {
           case 113: // TEXT ::= Number 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("TEXT",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1894,7 +2103,10 @@ class CUP$Parser$actions {
           case 114: // TEXT ::= Text 
             {
               Object RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = String.valueOf(a); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("TEXT",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;

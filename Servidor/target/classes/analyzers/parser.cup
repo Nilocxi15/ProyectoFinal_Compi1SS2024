@@ -2,10 +2,14 @@
 //-------> importaciones, paquetes
 package analyzers;
 import java_cup.runtime.Symbol;
+import java.time.LocalDateTime;
 
 //------> Codigo para el parser,variables, metodos
 parser code
 {:
+
+  public String resultado = "Se encontraron errores durante el análisis del código";
+  boolean error = false;
 
     //Metodo al que se llama automaticamente ante algun error sintactico
     public void syntax_error(Symbol s)
@@ -13,12 +17,16 @@ parser code
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
+        int tipo = s.sym;
 
         System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
         System.out.println("\t\tLexema: "+lexema);
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
+        System.out.println("\t\tTipo: "+tipo);
+        error = true;
 
+        error(fila, columna, tipo, lexema);
     }
 
     //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
@@ -27,21 +35,59 @@ parser code
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
+        int tipo = s.sym;
 
         System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
         System.out.println("\t\tLexema: "+lexema);
         System.out.println("\t\tFila: "+fila);
         System.out.println("\t\tColumna: "+columna);
+        System.out.println("\t\tTipo: "+tipo);
+        error = true;
 
+        error(fila, columna, tipo, lexema);
+    }
+
+    //Metodos para reiniciar los valores de resultado
+    public void resetParser() {
+      resultado = "Se encontraron errores durante el análisis del código";
+      error = false;
+    }
+
+    //Metodo para el manejo de errores
+    private void error(int fila, int columna, int tipo, String lexema) {
+      switch (tipo) {
+        case 2:
+          resultado += "\nError en la fila: "+fila+", columna: "+columna+". Se esperaba una variable, parámetro o el token '==' y se obtuvo: "+lexema;
+          break;
+        case 3:
+          resultado += "\nError en la fila: "+fila+", columna: "+columna+". No se esperaba el token: "+lexema; //Arreglas esto
+          break;
+      }
     }
 :}
 
 //------> Codigo para las acciones gramaticales
 action code
 {:
+
+  //Metodo para verificar el resultado del analisis
+  private void verifyParser() {
+  System.out.println("Estado del analisis " +error);
+    if (!error) {
+      resultado = null;
+      resultado = "------------------------------------------------------------------" + "\n";
+      resultado += "El analisis ha finalizado sin errores";
+      resultado += "\n";
+      resultado += "El archivo se generó correctamente con el nombre: "+ccName + "\n";
+      resultado += "------------------------------------------------------------------";
+    }
+  }
+
   //Metodos para contar los atributos de la etiqueta C_CC
   private int ccField1 = 0;
   private int ccField2 = 0;
+  private String ccName = "";
+  private String ccId = "";
 
   private void ccFieldOne() {
     ccField1++;
@@ -59,15 +105,35 @@ action code
   private void verifyCCFields() {
     if (ccField1 == 1 && ccField2 == 1) {
       System.out.println("Los campos de la etiqueta C_CC son correctos");
-    }
-    else if (ccField1 == 0 && ccField2 == 1) {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 0 && ccField2 == 1) {
+      ccId = java.time.LocalDateTime.now().toString();
       System.out.println("Parametro id de la etiqueta C_CC no encontrado");
-    }
-    else if (ccField1 == 1 && ccField2 == 0) {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 1 && ccField2 == 0) {
+      ccName = "CAPTCHA";
       System.out.println("Parametro name de la etiqueta C_CC no encontrado");
-    }
-    else {
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 == 0 && ccField2 == 0) {
+      ccName = "CAPTCHA";
+      ccId = java.time.LocalDateTime.now().toString();
       System.out.println("Parametros id y name de la etiqueta C_CC no encontrados");
+      System.out.println("El id encontrado es: "+ccId);
+      System.out.println("El name encontrado es: "+ccName);
+    } else if (ccField1 > 1 && ccField2 == 1) {
+      System.out.println("Se encontraron varios parametros id en la etiqueta C_CC");
+      System.out.println("El name encontrado es: "+ccName);
+      error = true;
+    } else if (ccField1 == 1 && ccField2 > 1) {
+      System.out.println("Se encontraron varios parametros name en la etiqueta C_CC");
+      System.out.println("El id encontrado es: "+ccId);
+      error = true;
+    } else {
+      System.out.println("Se encontraron varios parametros id y name en la etiqueta C_CC");
+      error = true;
     }
   }
 
@@ -91,15 +157,24 @@ action code
   private void verifyCHFields() {
     if (chField1 == 1 && chField2 == 1) {
       System.out.println("Los campos de la etiqueta C_HEADER son correctos");
-    }
-    else if (chField1 == 0 && chField2 == 1) {
+    } else if (chField1 == 0 && chField2 == 1) {
       System.out.println("Contenido del titulo de la etiqueta C_HEADER no encontrado");
-    }
-    else if (chField1 == 1 && chField2 == 0) {
+      error = true;
+    } else if (chField1 == 1 && chField2 == 0) {
       System.out.println("Parametro link de la etiqueta C_HEADER no encontrado");
-    }
-    else {
+      error = true;
+    } else if (chField1 == 0 && chField2 == 0) {
       System.out.println("Parametros id y name de la etiqueta C_HEADER no encontrados");
+      error = true;
+    } else if (chField1 > 1 && chField2 == 1) {
+      System.out.println("Se encontraron varios parametros link en la etiqueta C_HEADER");
+      error = true;
+    } else if (chField1 == 1 && chField2 > 1) {
+      System.out.println("Se encontraron varios parametros title en la etiqueta C_HEADER");
+      error = true;
+    } else {
+      System.out.println("Se encontraron varios parametros title y link en la etiqueta C_HEADER");
+      error = true;
     }
   }
 
@@ -123,6 +198,22 @@ action code
     }
   }
 
+  //Metodos para la escritura del archivo
+  private String head = null;
+  private String body = null;
+
+  private String titleHtml = null;
+  private String linkHtml = null;
+
+  private String bodyLabels = null;
+
+  private void resetStrings() {
+    head = null;
+    body = null;
+    titleHtml = null;
+    linkHtml = null;
+    bodyLabels = null;
+  }
 
 :}
 
@@ -153,51 +244,101 @@ precedence left por, div;
 start with INICIO;
 
 /*--------------- 3ra Area: Reglas Semanticas -----------------------*/
-INICIO ::= LessThan Html ATRIBINICIO GreaterThan HEADER BODY LessThan HtmlEnd GreaterThan {:System.out.println("Documento correcto");:};
+INICIO ::= LessThan Html ATRIBINICIO GreaterThan HEADER BODY LessThan HtmlEnd GreaterThan
+            {: verifyCCFields();
+            verifyParser();
+            verifyCHFields();
+            String text;
+            text = "<!DOCTYPE html>\n";
+            text += "<html lang = \"es\">\n";
+            if (head != null) {
+              text += head;
+            }
+            if (body != null) {
+              text += body;
+            }
+            text += "</html>";
+            System.out.println("CONTENIDO DEL DOCUMENTO: \n\n\n");
+            System.out.println(text);
+            ccFieldReset();
+            chFieldReset();
+            cbFieldReset();:};
 
-ATRIBINICIO ::= BracketOpen id Assign Quotes Text Quotes BracketClose ATRIBINICIO
-                {: ccFieldOne(); :}
-                |BracketOpen name Assign Quotes TEXT Quotes BracketClose ATRIBINICIO
-                {: ccFieldTwo(); :}
+ATRIBINICIO ::= BracketOpen id Assign Quotes Text:id Quotes BracketClose ATRIBINICIO
+                {: ccFieldOne();
+                 ccId = String.valueOf(id); :}
+                |BracketOpen name Assign Quotes TEXT:name Quotes BracketClose ATRIBINICIO
+                {: ccFieldTwo();
+                ccName = String.valueOf(name); :}
                 | error ATRIBINICIO
-                {:System.out.println("\t\tERROR EN LA PRODUCCION DE ATRIBUTOS DE INICIO");:}
                 | /* epsilon */;
 
 HEADER ::= LessThan Head GreaterThan CONTENTHEADER CONTENTHEADER LessThan HeadEnd GreaterThan
-            {:System.out.println("Se reconoció el cuerpo del header");:}
-            | error {:System.out.println("\t\tERROR EN LA PRODUCCION DE HEADER");:};
+            {: head = "<head>\n";
+            head += "\t<charset=\"UTF-8\">\n";
+            head += "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+            if (titleHtml != null) {
+              head += "\t<title>"+titleHtml+"</title>\n";
+            }
+            if (linkHtml != null) {
+              head += "\t<link rel=\"stylesheet\" href=\""+linkHtml+"\">\n";
+            }
+            head += "</head>\n";:}
+            | error;
 
-CONTENTHEADER ::= LessThan Title GreaterThan TEXT LessThan TitleEnd GreaterThan
-              {: chFieldOne();:}
-              | LessThan Link LINKTEXT GreaterThan LessThan LinkEnd GreaterThan
+CONTENTHEADER ::= LessThan Title GreaterThan TEXT:title LessThan TitleEnd GreaterThan
+              {: chFieldOne();
+              titleHtml = String.valueOf(title);:}
+              | LessThan Link LINKTEXT:link GreaterThan LessThan LinkEnd GreaterThan
               | error; // El epsilon de esta producción está pendiente de revisión
 
-LINKTEXT ::= BracketOpen href Assign Quotes LinkHtml Quotes BracketClose
-            {: chFieldTwo();:}
+LINKTEXT ::= BracketOpen href Assign Quotes LinkHtml:link Quotes BracketClose
+            {: chFieldTwo();
+            linkHtml = String.valueOf(link);:}
             | error LINKTEXT
-            {:System.out.println("\t\tERROR EN LA PRODUCCION DE LINKTEXT");:}
             | /* epsilon */;
 
-BODY ::= LessThan Body BODYTEXT GreaterThan LessThan BODYCONTENT BodyEnd GreaterThan
-        | error
-        {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODY");:};
+BODY ::= LessThan Body BODYTEXT:bodytext GreaterThan LessThan BODYCONTENT:bodycontent BodyEnd GreaterThan
+          {:
+          body = "<body";
+          if (bodytext != null) {
+            body += bodytext;
+          } else {
+            body += ">\n";
+          }
+          if (bodycontent != null) {
+            body += bodycontent;
+          }
+          body += "</body>\n";:}
+          | error;
 
-BODYTEXT ::= BracketOpen Background Assign Quotes COLOR Quotes BracketClose
+BODYTEXT ::= BracketOpen Background Assign Quotes COLOR:color Quotes BracketClose
+            {: RESULT = " style=\"background: "+ String.valueOf(color) +"\">\n"; :}
             | error BODYTEXT
-            {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYTEXT");:}
             | /* epsilon */;
 
-BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS SpanEnd GreaterThan LessThan BODYCONTENT
-                | Input INPUTPARAMETERS GreaterThan LessThan BODYCONTENT
-                | Textarea TEXTAREAPARAMETERS GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT
-                | Select SELECTPARAMETERS GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT
-                | Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan BODYCONTENT
-                | DivHtml DIVHTMLPARAMETERS GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT
-                | Img IMGPARAMETERS GreaterThan LessThan BODYCONTENT
-                | Br GreaterThan LessThan BODYCONTENT
-                | Button BUTTONPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT
-                | h1 H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT
-                | p H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT
+BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS SpanEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "SPAN\n" + a; :}
+                | Input INPUTPARAMETERS GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "INPUT\n" + a; :}
+                | Textarea TEXTAREAPARAMETERS GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "TEXTAREA\n" + a; :}
+                | Select SELECTPARAMETERS GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "SELECT\n" + a; :}
+                | Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "OPTION\n" + a; :}
+                | DivHtml DIVHTMLPARAMETERS GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "DIV\n" + a; :}
+                | Img IMGPARAMETERS GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "IMG\n" + a; :}
+                | Br GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "BR\n" + a; :}
+                | Button BUTTONPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "BUTTON\n" + a; :}
+                | h1 H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "H1\n" + a; :}
+                | p H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT:a
+                {: RESULT = "P\n" + a; :}
                 | error BODYCONTENT
                 {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYCONTENT");:}
                 | /* epsilon */;
@@ -286,18 +427,18 @@ SPANETIQUETAS ::= Br GreaterThan SPECIALTEXT LessThan SPANETIQUETAS
                   | error SPANETIQUETAS
                   | /* epsilon */;
 
-COLOR ::= Hexadecimal
-          | Color
+COLOR ::= Hexadecimal:a {: RESULT = String.valueOf(a); :}
+          | Color:a {: RESULT = String.valueOf(a); :}
           | error;
 
 IMAGESIZES ::= FontSize
               |ImageSize
               |error;
 
-TEXT ::= Text TEXT
-        | Number TEXT
-        | Number
-        | Text;
+TEXT ::= Text:a TEXT:b {: RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+        | Number:a TEXT:b {: RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+        | Number:a {: RESULT = String.valueOf(a); :}
+        | Text:a {: RESULT = String.valueOf(a); :};
 
 SIGNS ::= Assign
           | Plus

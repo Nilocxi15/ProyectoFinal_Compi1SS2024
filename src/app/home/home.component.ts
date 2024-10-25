@@ -23,7 +23,9 @@ export class HomeComponent implements OnInit {
     };
 
     this.socket.onmessage = (event) => {
-      console.log('Mensaje recibido del servidor:', event.data);
+      const message = event.data.toString();
+      console.log('Mensaje recibido del servidor:', message);
+      this.updateTerminal(message);
     };
 
     this.socket.onclose = () => {
@@ -174,5 +176,11 @@ export class HomeComponent implements OnInit {
       // Put caret at right position again
       textarea.selectionStart = textarea.selectionEnd = start + 1;
     }
+  }
+
+  //Método para actualizar la terminal
+  updateTerminal(result: string): void {
+    const terminal = document.getElementById('terminal') as HTMLTextAreaElement;
+    terminal.value = result;
   }
 }

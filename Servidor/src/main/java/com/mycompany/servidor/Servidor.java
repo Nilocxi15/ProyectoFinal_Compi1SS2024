@@ -40,11 +40,16 @@ public class Servidor extends WebSocketServer {
     Lexer lexer = new Lexer(new BufferedReader(new StringReader(message)));
     Parser parser = new Parser(lexer);
     try {
+      parser.resetParser();
       parser.parse();
+      if (parser.resultado != null) {
+        webSocket.send(parser.resultado);
+      } else {
+        webSocket.send("Error en la entrada\nNo se pudo analizar la entrada");
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
-    webSocket.send("Respuesta desde el servidor: " + s);
   }
 
   @Override

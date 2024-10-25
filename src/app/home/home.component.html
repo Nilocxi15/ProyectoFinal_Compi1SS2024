@@ -6,8 +6,12 @@
     <button type="button" class="btn btn-primary" (click)="clearContent()">
       Nuevo
     </button>
-    <button type="button" class="btn btn-primary" (click)="saveFile()">Guardar</button>
-    <button type="button" class="btn btn-primary" (click)="saveFileAs()">Guardar como</button>
+    <button type="button" class="btn btn-primary" (click)="saveFile()">
+      Guardar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="saveFileAs()">
+      Guardar como
+    </button>
   </div>
   <div class="tittle">
     <h3>
@@ -21,56 +25,53 @@
   style="display: none"
   (change)="openFile($event)"
 />
-<div class="input-group">
-  <textarea
-    class="form-control"
-    aria-label="With textarea"
-    id="scriptTextarea"
-    name="scriptTextarea"
-    (input)="updateCursorPosition($event)"
-    (keyup)="updateCursorPosition($event)"
-    (click)="updateCursorPosition($event)"
-    (mousemove)="updateCursorPosition($event)"
-    (keydown)="updateCursorPosition($event)"
-  ></textarea>
+<div class="content-container">
+  <div class="input-group">
+    <textarea
+      class="form-control"
+      aria-label="With textarea"
+      id="scriptTextarea"
+      name="scriptTextarea"
+      (input)="updateCursorPosition($event)"
+      (keyup)="updateCursorPosition($event)"
+      (click)="updateCursorPosition($event)"
+      (mousemove)="updateCursorPosition($event)"
+      (keydown)="updateCursorPosition($event)"
+    ></textarea>
+  </div>
+  <div class="tables">
+    <div class="errors-table">
+      <textarea
+        class="form-control"
+        name="terminal"
+        id="terminal"
+        readonly
+      ></textarea>
+    </div>
+    <div class="symbols-table">
+      <h4>Tabla de Símbolos</h4>
+      <table class="table table-info table-striped">
+        <thead>
+          <tr>
+            <th class="centered">Posición</th>
+            <th class="centered">Identificador</th>
+            <th class="centered">Tipo</th>
+            <th class="centered">Valor actual</th>
+            <th class="centered">Modo</th>
+            <th class="centered">Procedimiento</th>
+            <th class="centered">No. Ejecución</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
 </div>
 <div class="footer">
   <div class="line-column">
     Línea: <span>{{ line }}</span
-    >, Columna:
-    <span>{{ column }}</span>
+    >, Columna: <span>{{ column }}</span>
   </div>
-  <button type="button" class="btn btn-success" (click)="getContent()">Ejecutar</button>
-</div>
-<div class="tables">
-  <div class="errors-table">
-    <h4>Tabla de Errores</h4>
-    <table class="table table-danger table-striped">
-      <thead>
-        <tr>
-          <th class="centered">Línea</th>
-          <th class="centered">Columna</th>
-          <th class="centered">Descripción</th>
-          <th class="centered">Tipo</th>
-          <th class="centered">Posible Solución</th>
-        </tr>
-      </thead>
-    </table>
-  </div>
-  <div class="symbols-table">
-    <h4>Tabla de Símbolos</h4>
-    <table class="table table-info table-striped">
-      <thead>
-        <tr>
-          <th class="centered">Posición</th>
-          <th class="centered">Identificador</th>
-          <th class="centered">Tipo</th>
-          <th class="centered">Valor actual</th>
-          <th class="centered">Modo</th>
-          <th class="centered">Procedimiento</th>
-          <th class="centered">No. Ejecución</th>
-        </tr>
-      </thead>
-    </table>
-  </div>
+  <button type="button" class="btn btn-success" (click)="getContent()">
+    Ejecutar
+  </button>
 </div>
