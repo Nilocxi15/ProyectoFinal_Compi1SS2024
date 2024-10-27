@@ -205,14 +205,16 @@ action code
   private String titleHtml = null;
   private String linkHtml = null;
 
-  private String bodyLabels = null;
+  private String spanStyles =  "style = \"";
+  private String spanId = "id = \"";
 
   private void resetStrings() {
     head = null;
     body = null;
     titleHtml = null;
     linkHtml = null;
-    bodyLabels = null;
+    spanStyles = "style = \"";
+    spanId = "id = \"";
   }
 
 :}
@@ -306,7 +308,7 @@ BODY ::= LessThan Body BODYTEXT:bodytext GreaterThan LessThan BODYCONTENT:bodyco
           } else {
             body += ">\n";
           }
-          if (bodycontent != null) {
+          if (String.valueOf(bodycontent) != null) {
             body += bodycontent;
           }
           body += "</body>\n";:}
@@ -317,38 +319,97 @@ BODYTEXT ::= BracketOpen Background Assign Quotes COLOR:color Quotes BracketClos
             | error BODYTEXT
             | /* epsilon */;
 
-BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS SpanEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "SPAN\n" + a; :}
-                | Input INPUTPARAMETERS GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "INPUT\n" + a; :}
-                | Textarea TEXTAREAPARAMETERS GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "TEXTAREA\n" + a; :}
-                | Select SELECTPARAMETERS GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "SELECT\n" + a; :}
-                | Option GreaterThan SPECIALTEXT LessThan OptionEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "OPTION\n" + a; :}
-                | DivHtml DIVHTMLPARAMETERS GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "DIV\n" + a; :}
-                | Img IMGPARAMETERS GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "IMG\n" + a; :}
+BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT:text LessThan SPANETIQUETAS:labels SpanEnd GreaterThan LessThan BODYCONTENT:a
+                {: String spanText;
+                spanText = "\t<span "+ spanStyles + " \" " + spanId + " \" >\n" ;              
+                if (text != null) {
+                    spanText += "\t\t" + text + "\n";
+                }
+                if (labels != null) {
+                    spanText += "\t" +labels + "\n";
+                }
+                spanText += "\t</span>\n";
+                if (a != null) { 
+                    RESULT = spanText + String.valueOf(a);
+                } else {
+                    RESULT = spanText;
+                } :}
+                | Input INPUTPARAMETERS:parameters GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | Textarea TEXTAREAPARAMETERS:parameters GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | Select SELECTPARAMETERS:parameters GreaterThan LessThan SELECTETIQUETAS SelectEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | Option GreaterThan SPECIALTEXT:parameters LessThan OptionEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | DivHtml DIVHTMLPARAMETERS:parameters GreaterThan LessThan BODYCONTENT DivHtmlEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) { 
+                RESULT = "DIV\n" + a;
+                } else {
+                RESULT = "DIV\n";
+                } :}
+                | Img IMGPARAMETERS:parameters GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
                 | Br GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "BR\n" + a; :}
-                | Button BUTTONPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "BUTTON\n" + a; :}
-                | h1 H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "H1\n" + a; :}
-                | p H1PPARAMETERS GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT:a
-                {: RESULT = "P\n" + a; :}
+                {: if (a != null) {
+                RESULT = "\t<br>\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | Button BUTTONPARAMETERS:parameters GreaterThan SPECIALTEXT LessThan BUTTONETIQUETAS ButtonEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | h1 H1PPARAMETERS:parameters GreaterThan SPECIALTEXT LessThan SPANETIQUETAS h1End GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
+                | p H1PPARAMETERS:parameters GreaterThan SPECIALTEXT LessThan SPANETIQUETAS pEnd GreaterThan LessThan BODYCONTENT:a
+                {: if (a != null) {
+                RESULT = "\n" + a;
+                } else {
+                RESULT = "\n";
+                } :}
                 | error BODYCONTENT
-                {:System.out.println("\t\tERROR EN LA PRODUCCION DE BODYCONTENT");:}
-                | /* epsilon */;
+                | /* epsilon */
+                {: RESULT = null;:};
 
-SPANPARAMETERS ::= BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose SPANPARAMETERS
-                  | BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose SPANPARAMETERS
-                  | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose SPANPARAMETERS
-                  | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose SPANPARAMETERS
-                  | BracketOpen id Assign Quotes Text Quotes BracketClose SPANPARAMETERS
+SPANPARAMETERS ::= BracketOpen ColorSentence Assign Quotes COLOR:color Quotes BracketClose SPANPARAMETERS
+                  {: spanStyles += " color: " + String.valueOf(color) + ";"; :}
+                  | BracketOpen FontSizeSentence Assign Quotes FontSize:size Quotes BracketClose SPANPARAMETERS
+                  {: spanStyles += " font-size: " + String.valueOf(size) + ";"; :}
+                  | BracketOpen FontFamilySentence Assign Quotes FontFamily:font Quotes BracketClose SPANPARAMETERS
+                  {: spanStyles += " font-family: " + String.valueOf(font) + ";"; :}
+                  | BracketOpen TextAlignSentence Assign Quotes TextAlign:align Quotes BracketClose SPANPARAMETERS
+                  {: spanStyles += " text-align: " + String.valueOf(align) + ";"; :}
+                  | BracketOpen id Assign Quotes Text:id Quotes BracketClose SPANPARAMETERS
+                  {: spanId += String.valueOf(id);:}
                   | error SPANPARAMETERS
+                  {: RESULT = null; :}
                   | /* epsilon */;
 
 INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type Quotes BracketClose INPUTPARAMETERS
@@ -423,7 +484,12 @@ BUTTONETIQUETAS ::= Img IMGPARAMETERS GreaterThan SPECIALTEXT LessThan BUTTONETI
                     | error BUTTONETIQUETAS
                     | /* epsilon */;
 
-SPANETIQUETAS ::= Br GreaterThan SPECIALTEXT LessThan SPANETIQUETAS
+SPANETIQUETAS ::= Br GreaterThan SPECIALTEXT:text LessThan SPANETIQUETAS
+                  {: if (text != null) {
+                    RESULT = "\t<br>\n" + String.valueOf(text);
+                  } else {
+                    RESULT = "\t<br>\n";
+                  } :}
                   | error SPANETIQUETAS
                   | /* epsilon */;
 
@@ -440,22 +506,47 @@ TEXT ::= Text:a TEXT:b {: RESULT = String.valueOf(a) + " " + String.valueOf(b); 
         | Number:a {: RESULT = String.valueOf(a); :}
         | Text:a {: RESULT = String.valueOf(a); :};
 
-SIGNS ::= Assign
-          | Plus
-          | Minus
-          | Div
-          | Mult
-          | ParOpen
-          | ParClose
-          | Quotes
-          | BracketOpen
-          | BracketClose;
+SIGNS ::= Assign:a
+          {: RESULT = String.valueOf(a); :}
+          | Plus:a
+          {: RESULT = String.valueOf(a); :}
+          | Minus:a
+          {: RESULT = String.valueOf(a); :}
+          | Div:a
+          {: RESULT = String.valueOf(a); :}
+          | Mult:a
+          {: RESULT = String.valueOf(a); :}
+          | ParOpen:a
+          {: RESULT = String.valueOf(a); :}
+          | ParClose:a
+          {: RESULT = String.valueOf(a); :}
+          | Quotes:a
+          {: RESULT = String.valueOf(a); :}
+          | BracketOpen:a
+          {: RESULT = String.valueOf(a); :}
+          | BracketClose:a
+          {: RESULT = String.valueOf(a); :};
 
 CLASSOPTIONS ::= Column
                 | Row
                 | error;
 
-SPECIALTEXT ::= Text SPECIALTEXT
-                | Number SPECIALTEXT
-                | SIGNS SPECIALTEXT
+SPECIALTEXT ::= Text:a SPECIALTEXT:b
+                {: if (b != null) { 
+                    RESULT = String.valueOf(a) + " " + String.valueOf(b);
+                } else {
+                    RESULT = String.valueOf(a);
+                } :}
+                | Number:a SPECIALTEXT:b
+                {: if (b != null) { 
+                    RESULT = String.valueOf(a) + " " + String.valueOf(b);
+                } else {
+                    RESULT = String.valueOf(a);
+                } :}
+                | SIGNS:a SPECIALTEXT:b
+                {: if (b != null) { 
+                    RESULT = String.valueOf(a) + " " + String.valueOf(b);
+                } else {
+                    RESULT = String.valueOf(a);
+                } :}
                 | /* epsilon */;

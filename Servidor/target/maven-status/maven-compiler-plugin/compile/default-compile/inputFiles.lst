@@ -1,1 +1,4 @@
-/home/javier/Documentos/Progra/Compi1/ProyectoFinal/ProyectoFinal_Compi1SS2024/Servidor/src/main/java/com/mycompany/servidor/Servidor.java
+/home/javier/Documentos/Progra/Compi1/ProyectoFinal_Compi1SS2024/Servidor/src/main/java/analyzers/Lexer.java
+/home/javier/Documentos/Progra/Compi1/ProyectoFinal_Compi1SS2024/Servidor/src/main/java/analyzers/Parser.java
+/home/javier/Documentos/Progra/Compi1/ProyectoFinal_Compi1SS2024/Servidor/src/main/java/analyzers/Symbols.java
+/home/javier/Documentos/Progra/Compi1/ProyectoFinal_Compi1SS2024/Servidor/src/main/java/com/mycompany/servidor/Servidor.java
