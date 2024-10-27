@@ -208,6 +208,10 @@ action code
   private String spanStyles =  "style = \"";
   private String spanId = "id = \"";
 
+  private String typeInput = "type = \"";
+  private String idInput = "id = \"";
+  private String styleInput = "style = \"";
+
   private void resetStrings() {
     head = null;
     body = null;
@@ -335,10 +339,12 @@ BODYCONTENT ::=  Span SPANPARAMETERS GreaterThan SPECIALTEXT:text LessThan SPANE
                     RESULT = spanText;
                 } :}
                 | Input INPUTPARAMETERS:parameters GreaterThan LessThan BODYCONTENT:a
-                {: if (a != null) {
-                RESULT = "\n" + a;
+                {: String inputText;
+                inputText = "\t<input " + typeInput + " \" " + idInput + " \" " + styleInput + " \" >\n";
+                if (a != null) {
+                    RESULT = inputText + String.valueOf(a);
                 } else {
-                RESULT = "\n";
+                    RESULT = inputText;
                 } :}
                 | Textarea TEXTAREAPARAMETERS:parameters GreaterThan SPECIALTEXT LessThan TextareaEnd GreaterThan LessThan BODYCONTENT:a
                 {: if (a != null) {
@@ -412,12 +418,18 @@ SPANPARAMETERS ::= BracketOpen ColorSentence Assign Quotes COLOR:color Quotes Br
                   {: RESULT = null; :}
                   | /* epsilon */;
 
-INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type Quotes BracketClose INPUTPARAMETERS
-                    | BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose INPUTPARAMETERS
-                    | BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose INPUTPARAMETERS
-                    | BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose INPUTPARAMETERS
-                    | BracketOpen id Assign Quotes Text Quotes BracketClose INPUTPARAMETERS
-                    | BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose INPUTPARAMETERS
+INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type:type Quotes BracketClose INPUTPARAMETERS
+                    {: typeInput += String.valueOf(type); :}
+                    | BracketOpen FontSizeSentence Assign Quotes FontSize:size Quotes BracketClose INPUTPARAMETERS
+                    {: styleInput += " font-size: " + String.valueOf(size) + ";"; :}
+                    | BracketOpen FontFamilySentence Assign Quotes FontFamily:font Quotes BracketClose INPUTPARAMETERS
+                    {:styleInput += " font-family: " + String.valueOf(font) + ";"; :}
+                    | BracketOpen TextAlignSentence Assign Quotes TextAlign:align Quotes BracketClose INPUTPARAMETERS
+                    {: styleInput += " text-align: " + String.valueOf(align) + ";"; :}
+                    | BracketOpen id Assign Quotes Text:id Quotes BracketClose INPUTPARAMETERS
+                    {: idInput += String.valueOf(id); :}
+                    | BracketOpen ColorSentence Assign Quotes COLOR:color Quotes BracketClose INPUTPARAMETERS
+                    {: styleInput += " color: " + String.valueOf(color) + ";"; :}
                     | error INPUTPARAMETERS
                     | /* epsilon */;
 

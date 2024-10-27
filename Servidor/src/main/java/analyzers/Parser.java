@@ -921,6 +921,10 @@ class CUP$Parser$actions {
   private String spanStyles =  "style = \"";
   private String spanId = "id = \"";
 
+  private String typeInput = "type = \"";
+  private String idInput = "id = \"";
+  private String styleInput = "style = \"";
+
   private void resetStrings() {
     head = null;
     body = null;
@@ -1233,10 +1237,12 @@ class CUP$Parser$actions {
 		int aleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int aright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if (a != null) {
-                RESULT = "\n" + a;
+		 String inputText;
+                inputText = "\t<input " + typeInput + " \" " + idInput + " \" " + styleInput + " \" >\n";
+                if (a != null) {
+                    RESULT = inputText + String.valueOf(a);
                 } else {
-                RESULT = "\n";
+                    RESULT = inputText;
                 } 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("BODYCONTENT",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -1510,7 +1516,10 @@ class CUP$Parser$actions {
           case 39: // INPUTPARAMETERS ::= BracketOpen TypeSentence Assign Quotes Type Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int typeleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int typeright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object type = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 typeInput += String.valueOf(type); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1519,7 +1528,10 @@ class CUP$Parser$actions {
           case 40: // INPUTPARAMETERS ::= BracketOpen FontSizeSentence Assign Quotes FontSize Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int sizeleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int sizeright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object size = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 styleInput += " font-size: " + String.valueOf(size) + ";"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1528,7 +1540,10 @@ class CUP$Parser$actions {
           case 41: // INPUTPARAMETERS ::= BracketOpen FontFamilySentence Assign Quotes FontFamily Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int fontleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int fontright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object font = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		styleInput += " font-family: " + String.valueOf(font) + ";"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1537,7 +1552,10 @@ class CUP$Parser$actions {
           case 42: // INPUTPARAMETERS ::= BracketOpen TextAlignSentence Assign Quotes TextAlign Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int alignleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int alignright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object align = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 styleInput += " text-align: " + String.valueOf(align) + ";"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1546,7 +1564,10 @@ class CUP$Parser$actions {
           case 43: // INPUTPARAMETERS ::= BracketOpen id Assign Quotes Text Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int idleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object id = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 idInput += String.valueOf(id); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1555,7 +1576,10 @@ class CUP$Parser$actions {
           case 44: // INPUTPARAMETERS ::= BracketOpen ColorSentence Assign Quotes COLOR Quotes BracketClose INPUTPARAMETERS 
             {
               Object RESULT =null;
-
+		int colorleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int colorright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object color = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
+		 styleInput += " color: " + String.valueOf(color) + ";"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("INPUTPARAMETERS",12, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2081,7 +2105,7 @@ class CUP$Parser$actions {
 		int textright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object text = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		 if (text != null) {
-                    RESULT = "\t<br>" + String.valueOf(text);
+                    RESULT = "\t<br>\n" + String.valueOf(text);
                   } else {
                     RESULT = "\t<br>\n";
                   } 
